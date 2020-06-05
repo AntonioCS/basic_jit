@@ -18,3 +18,4 @@ endif()
 
 add_subdirectory(video1)
 add_subdirectory(video2) 
+add_subdirectory(video3) 
