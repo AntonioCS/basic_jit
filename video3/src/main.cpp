@@ -18,6 +18,7 @@ namespace {
     using s64 = int64_t;
     using s32 = int32_t;
     using u8 = uint8_t;
+    using s8 = int8_t;
     using constant_s32 = s32(*)();
     using identify_s64 = s64(*)(s64);
     using increment_s64 = s64(*)(s64);
@@ -59,14 +60,17 @@ namespace {
         void append(vtype value)
         {
             m_memory[m_position] = value;
-            //std::cout << "Size of: " << sizeof value << '\n';
             m_position += sizeof value;
-            //std::cout << "Position: " << m_position << '\n';
         }
 
         template <typename  vtype, typename ...Targs>
         void append(Targs&&... targs) {
             (append(static_cast<vtype>(std::forward<Targs>(targs))), ...);
+        }
+
+        void append_ret()
+        {
+            append<u8>(asm_x64_ret);
         }
    
         virtual void memory_manipulation() = 0;
@@ -81,11 +85,10 @@ namespace {
 
     class MakeConstant32 : public FuncGeneratorBase<constant_s32>
     {
+        using FuncGeneratorBase::FuncGeneratorBase;
     public:
-        void memory_manipulation() override
-        {
-            
-        }
+        void memory_manipulation() override { }
+
         void memory_manipulation(s32 value)
         {
             //{ 0x48, 0xC7, 0xC0, <immediate_value> }
@@ -97,7 +100,7 @@ namespace {
 
             append(value);
 
-            append<u8>(asm_x64_ret);
+            append_ret();
         }
 
         constant_s32 makeFunc(s32 value)
@@ -109,9 +112,8 @@ namespace {
 
     class MakeIncrements64 : public FuncGeneratorBase<increment_s64>
     {
-
+        using FuncGeneratorBase::FuncGeneratorBase;
     public:
-        MakeIncrements64(std::size_t size = buffsize) : FuncGeneratorBase(size) { }
 
         void memory_manipulation() override
         {
@@ -252,7 +254,7 @@ int main() {
     {
         const char* msg = "should create a function that increases the s64 value that was passed\n";
         constexpr auto expected_result = 42;
-        MakeIncrements64 makeIncrement_s64;
+        MakeIncrements64 makeIncrement_s64{512};
 
 
         auto func = makeIncrement_s64.makeFunc();
