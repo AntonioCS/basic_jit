@@ -20,7 +20,7 @@ public:
 
         append(value);
 
-        append_ret();
+        asm_ret();
     }
 
     constant_s32 makeFunc(s32 value)

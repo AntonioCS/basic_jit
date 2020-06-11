@@ -18,6 +18,6 @@ class MakeIdentity64 : public FuncGeneratorBase<identify_s64>
             0x89,
             0xC8,
             asm_x64_ret
-            );
+        );
     }
 };
